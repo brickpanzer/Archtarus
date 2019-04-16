@@ -11,8 +11,8 @@
 Planet::Planet(int x, int y, int size) : x_(x), y_(y), size_(size)
 {
     setAcceptHoverEvents(true);
-    x_offset_ = QRandomGenerator::global()->bounded(0,50);
-    y_offset_ = QRandomGenerator::global()->bounded(0,50);
+//    x_offset_ = QRandomGenerator::global()->bounded(0,50);
+//    y_offset_ = QRandomGenerator::global()->bounded(0,50);
     switch(size){
     case 0 : parts_ = 0;
              fuel_ = 0;
@@ -61,13 +61,16 @@ void Planet::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QW
     QBrush b = painter->brush();
     painter->setBrush(QBrush(color_.dark(option->state & QStyle::State_Sunken ? 120 : 100)));
 
-    painter->drawEllipse(QRect((this->x_ + x_offset_), (this->y_ + y_offset_), width_, width_));
+    painter->drawEllipse(QRect(this->x_, this->y_, width_, width_));
     painter->setBrush(b);
 }
 
 void Planet::hoverEnterEvent(QGraphicsSceneHoverEvent *event){
     QGraphicsItem::hoverEnterEvent(event);
+    qDebug() << "Class: " << size_;
     qDebug() << "Parts: " << parts_;
+    qDebug() << "Fuel: " << fuel_;
+    qDebug() << "Inhabidants: " << people_;
 }
 
 void Planet::hoverLeaveEvent(QGraphicsSceneHoverEvent *event){

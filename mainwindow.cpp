@@ -24,8 +24,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     for(int i = 0; i < 179; i++){
         for(int x = 0; x < 191; x++){
-            const int x_coord = x * 100;
-            const int y_coord = i * 100;
+            const int x_coord = (x * 100) + QRandomGenerator::global()->bounded(0,50);
+            const int y_coord = (i * 100) + QRandomGenerator::global()->bounded(0,50);
             int rand = QRandomGenerator::global()->bounded(0,16);
             int size;
             if(rand < 10){

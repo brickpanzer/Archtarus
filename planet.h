@@ -23,8 +23,8 @@ public:
 private:
     int x_;
     int y_;
-    int x_offset_;
-    int y_offset_;
+//    int x_offset_;
+//    int y_offset_;
     int size_;
     int width_;
     QColor color_;
