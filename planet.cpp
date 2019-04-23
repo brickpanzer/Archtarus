@@ -8,7 +8,7 @@
 
 #include "planet.h"
 
-Planet::Planet(int x, int y, int size) : x_(x), y_(y), size_(size)
+Planet::Planet(int x, int y,int x_off, int y_off, int size) : x_(x), y_(y),x_offset_(x_off),y_offset_(y_off), size_(size)
 {
     setAcceptHoverEvents(true);
 //    x_offset_ = QRandomGenerator::global()->bounded(0,50);
@@ -59,9 +59,16 @@ void Planet::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QW
     Q_UNUSED(widget);
 
     QBrush b = painter->brush();
+//    QColor black;
+//    black.setRgb(0,0,0);
+
+//    painter->setBrush(QBrush(black.dark(option->state & QStyle::State_Sunken ? 120 : 100)));
+
+//    painter->drawRect(QRect(this->x_, this->y_, 100, 100));
+
     painter->setBrush(QBrush(color_.dark(option->state & QStyle::State_Sunken ? 120 : 100)));
 
-    painter->drawEllipse(QRect(this->x_, this->y_, width_, width_));
+    painter->drawEllipse(QRect(this->x_ + this->x_offset_, this->y_ + this->y_offset_, width_, width_));
     painter->setBrush(b);
 }
 

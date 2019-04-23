@@ -8,7 +8,7 @@ class Planet : public QObject , public QGraphicsItem
 {
     Q_OBJECT
 public:
-    Planet(const int x, const int y, const int size);
+    Planet(const int x, const int y,const int x_off, const int y_off, const int size);
 
     int get_x() const { return x_; }  // inline member function
     int get_y() const { return y_; }  // inline member function
@@ -23,8 +23,8 @@ public:
 private:
     int x_;
     int y_;
-//    int x_offset_;
-//    int y_offset_;
+    int x_offset_;
+    int y_offset_;
     int size_;
     int width_;
     QColor color_;

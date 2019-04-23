@@ -10,7 +10,27 @@
 
 Player::Player(const int x, const int y, const int num): x_(x), y_(y), player_num_(num)
 {
-
+    parts_ = 0.0;
+    fuel_ = 0.0;
+    people_ = 0.0;
+    fleet_lvl_ = 0;
+    std::vector<Planet*> tmp;
+    planets_ = tmp;
+    QColor color;
+    switch(player_num_){
+        case 1: color.setRgb(27,24,219);
+                player_color_ = color;
+                break;
+        case 2: color.setRgb(37,219,24);
+                player_color_ = color;
+                break;
+        case 3: color.setRgb(219,24,203);
+                player_color_ = color;
+                break;
+        case 4: color.setRgb(24,209,219);
+                player_color_ = color;
+                break;
+    }
 }
 
 QRectF Player::boundingRect() const

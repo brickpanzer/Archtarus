@@ -27,6 +27,12 @@ private slots:
 
     void on_actionPlayer_1_triggered();
 
+    void on_fleet_button_clicked();
+
+    void on_take_turn_clicked();
+
+    void on_actionAdd_Player_triggered();
+
 private:
     Ui::MainWindow *ui;
 
@@ -35,6 +41,10 @@ private:
     Planet * starmap_[179][191];
 
     Player * players_[4];
+
+    int total_planets_;
+    int total_players_;
+    int current_player_;
 };
 
 #endif // MAINWINDOW_H

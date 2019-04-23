@@ -15,6 +15,11 @@ public:
 
     int get_x() const { return x_; }  // inline member function
     int get_y() const { return y_; }  // inline member function
+    int get_planets_() const { return planets_.size(); }
+    double get_parts() const { return parts_; }
+    double get_fuel() const { return fuel_; }
+    double get_people() const { return people_; }
+    int get_fleet_lvl() const { return fleet_lvl_; }
 
     QRectF boundingRect() const override;
     QPainterPath shape() const override;
