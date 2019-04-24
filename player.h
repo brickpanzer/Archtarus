@@ -20,6 +20,10 @@ public:
     double get_fuel() const { return fuel_; }
     double get_people() const { return people_; }
     int get_fleet_lvl() const { return fleet_lvl_; }
+    QColor get_player_color() const { return player_color_; }
+
+    void call_turn();
+    void add_planet(Planet *p);
 
     QRectF boundingRect() const override;
     QPainterPath shape() const override;

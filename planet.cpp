@@ -43,13 +43,13 @@ Planet::Planet(int x, int y,int x_off, int y_off, int size) : x_(x), y_(y),x_off
 
 QRectF Planet::boundingRect() const
 {
-    return QRectF(x_, y_, width_, width_);
+    return QRectF(x_ + x_offset_, y_ + y_offset_, width_, width_);
 }
 
 QPainterPath Planet::shape() const
 {
     QPainterPath path;
-    path.addEllipse(x_, y_, width_, width_);
+    path.addEllipse(x_ + x_offset_, y_ + y_offset_, width_, width_);
     return path;
 }
 
@@ -74,6 +74,11 @@ void Planet::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QW
 
 void Planet::hoverEnterEvent(QGraphicsSceneHoverEvent *event){
     QGraphicsItem::hoverEnterEvent(event);
+    setToolTip("Class: " + QString::number(size_) + "\n"
+               "Parts: " + QString::number(parts_) + "\n"
+               "Fuel: " + QString::number(fuel_) + "\n"
+               "Inhabidants: " + QString::number(people_)
+               );
     qDebug() << "Class: " << size_;
     qDebug() << "Parts: " << parts_;
     qDebug() << "Fuel: " << fuel_;
@@ -83,4 +88,11 @@ void Planet::hoverEnterEvent(QGraphicsSceneHoverEvent *event){
 void Planet::hoverLeaveEvent(QGraphicsSceneHoverEvent *event){
     QGraphicsItem::hoverLeaveEvent(event);
     qDebug() << "Exited";
+}
+
+void Planet::mousePressEvent(QGraphicsSceneMouseEvent *event) {
+
+    QGraphicsItem::mousePressEvent(event);
+
+
 }

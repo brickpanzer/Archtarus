@@ -59,3 +59,16 @@ void Player::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QW
     painter->drawEllipse(QRect(this->x_, this->y_, 20, 20));
     painter->setBrush(b);
 }
+
+void Player::call_turn()
+{
+    for(Planet * p : this->planets_){
+        fuel_ += p->get_fuel();
+        parts_ += p->get_parts();
+        people_ += p->get_people();
+    }
+}
+
+void Player::add_planet(Planet *p){
+    planets_.push_back(p);
+}

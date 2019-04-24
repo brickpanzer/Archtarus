@@ -33,6 +33,10 @@ private slots:
 
     void on_actionAdd_Player_triggered();
 
+    void PlanetClickedSlot(Planet * p);
+
+signals:
+    void change_player_id(QColor color);
 private:
     Ui::MainWindow *ui;
 

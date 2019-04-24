@@ -48,6 +48,7 @@ MainWindow::MainWindow(QWidget *parent) :
             Planet * temp = new Planet(x_coord,y_coord,x_off,y_off,size);
             starmap_[i][x] = temp;
             scene->addItem(temp);
+            connect(temp, &Planet::PlanetClicked, this, &MainWindow::PlanetClickedSlot);
         }
     }
 
@@ -106,12 +107,14 @@ void MainWindow::on_fleet_button_clicked()
 /*
  1 - confirms current players turn
  2 - loads new player
- 3 - changes toolbar stats to match current player
+ 3 - adds resources-per-tunr to current players pool
+ 4 - changes toolbar stats to match current player
 */
 void MainWindow::on_take_turn_clicked()
 {
     //change player
     current_player_ = (current_player_ + 1) % total_players_;
+
 
     //set fuel guage
     QString fuel_str = "Fuel: ";
@@ -139,4 +142,10 @@ void MainWindow::on_actionAdd_Player_triggered()
         default:
                  break;
     }
+}
+
+void MainWindow::PlanetClickedSlot(Planet * p)
+{
+    players_[current_player_]->add_planet(p);
+    emit(change_player_id(players_[current_player_]->get_player_color()));
 }

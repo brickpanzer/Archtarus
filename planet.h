@@ -12,6 +12,9 @@ public:
 
     int get_x() const { return x_; }  // inline member function
     int get_y() const { return y_; }  // inline member function
+    double get_parts() const { return parts_; }
+    double get_fuel() const { return fuel_; }
+    double get_people() const { return people_; }
 
     QRectF boundingRect() const override;
     QPainterPath shape() const override;
@@ -20,6 +23,12 @@ public:
 
     void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override;
     void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;
+public slots:
+    void ChangePlanetOwner(QColor color);
+signals:
+    void PlanetClicked(Planet * p);
+protected:
+    void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
 private:
     int x_;
     int y_;
