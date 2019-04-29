@@ -115,10 +115,13 @@ void MainWindow::on_take_turn_clicked()
     //change player
     current_player_ = (current_player_ + 1) % total_players_;
 
+    //update stats
+
+    players_[current_player_]->call_turn();
 
     //set fuel guage
     QString fuel_str = "Fuel: ";
-    fuel_str.append(QString::number(20));
+    fuel_str.append(QString::number(players_[current_player_]->get_fuel()));
     ui->menuFuel_0->setTitle(fuel_str);
 
     //set win percentage
@@ -146,6 +149,24 @@ void MainWindow::on_actionAdd_Player_triggered()
 
 void MainWindow::PlanetClickedSlot(Planet * p)
 {
+    //if planet already owned
+    if(p->get_owner_id() != -1){
+        bool win = true;
+        //fight for planet
+
+        if(win){
+            //delete planet from previous owner, decrement resources
+            /*
+             * for(Planet * x : player->get_planets()){
+             *  if(x->id == p->id){
+             *      player->get_planets().erase(x);
+             *  }
+             * }
+            */
+        }
+
+    }
     players_[current_player_]->add_planet(p);
-    emit(change_player_id(players_[current_player_]->get_player_color()));
+    p->ChangePlanetOwner(players_[current_player_]->get_player_color(), current_player_);
+    qDebug() << "Planet clicked slot triggered";
 }

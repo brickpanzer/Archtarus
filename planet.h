@@ -15,6 +15,7 @@ public:
     double get_parts() const { return parts_; }
     double get_fuel() const { return fuel_; }
     double get_people() const { return people_; }
+    int get_owner_id() const { return owner_id_; }
 
     QRectF boundingRect() const override;
     QPainterPath shape() const override;
@@ -23,8 +24,7 @@ public:
 
     void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override;
     void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;
-public slots:
-    void ChangePlanetOwner(QColor color);
+    void ChangePlanetOwner(QColor color, int id);
 signals:
     void PlanetClicked(Planet * p);
 protected:

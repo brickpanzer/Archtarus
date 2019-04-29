@@ -13,6 +13,7 @@ Planet::Planet(int x, int y,int x_off, int y_off, int size) : x_(x), y_(y),x_off
     setAcceptHoverEvents(true);
 //    x_offset_ = QRandomGenerator::global()->bounded(0,50);
 //    y_offset_ = QRandomGenerator::global()->bounded(0,50);
+    owner_id_ = -1;
     switch(size){
     case 0 : parts_ = 0;
              fuel_ = 0;
@@ -90,9 +91,17 @@ void Planet::hoverLeaveEvent(QGraphicsSceneHoverEvent *event){
     qDebug() << "Exited";
 }
 
+void Planet::ChangePlanetOwner(QColor c, int id){
+    owner_id_ = id;
+    color_ = c;
+    update();
+
+}
+
 void Planet::mousePressEvent(QGraphicsSceneMouseEvent *event) {
 
     QGraphicsItem::mousePressEvent(event);
-
+    qDebug() << "Planet mouse press event triggered";
+    emit(PlanetClicked(this));
 
 }
