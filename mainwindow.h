@@ -42,7 +42,7 @@ private:
 
     QGraphicsScene *scene;
 
-    Planet * starmap_[179][191];
+    Planet * starmap_[10][18];
 
     Player * players_[4];
 

@@ -21,9 +21,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     view->setScene(scene);
     view->setSceneRect(0,0,view->frameSize().width(),view->frameSize().height());
-
-    for(int i = 0; i < 179; i++){
-        for(int x = 0; x < 191; x++){
+    total_planets_ = 0;
+    for(int i = 0; i < 10; i++){
+        for(int x = 0; x < 18; x++){
             const int x_coord = (x * 100);
             const int y_coord = (i * 100);
             const int x_off = QRandomGenerator::global()->bounded(0,50);
@@ -126,7 +126,8 @@ void MainWindow::on_take_turn_clicked()
 
     //set win percentage
     QString win_str = "Win %: ";
-    win_str.append(QString::number(players_[current_player_ - 1]->get_planets_() / total_planets_)); //current players planet count / all planets in game
+    double win = players_[current_player_]->get_planets_() / total_planets_;
+    win_str.append(QString::number(players_[current_player_]->get_planets_()) + "/" + QString::number(total_planets_)); //current players planet count / all planets in game
     ui->menuWin_0->setTitle(win_str);
 }
 
