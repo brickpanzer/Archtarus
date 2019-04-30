@@ -112,6 +112,14 @@ void MainWindow::on_fleet_button_clicked()
 */
 void MainWindow::on_take_turn_clicked()
 {
+    qDebug() << "My Planets: " << players_[current_player_]->get_planets_();
+    qDebug() << "Needed Planets: " << total_planets_;
+    if(players_[current_player_]->get_planets_() == total_planets_){
+        qDebug() << "Win Condition!";
+        QMessageBox you_win;
+        you_win.setText("Player: " + QString::number(current_player_ + 1) + " wins!");
+        you_win.exec();
+    }
     //change player
     current_player_ = (current_player_ + 1) % total_players_;
 
@@ -127,6 +135,7 @@ void MainWindow::on_take_turn_clicked()
     //set win percentage
     QString win_str = "Win %: ";
     double win = players_[current_player_]->get_planets_() / total_planets_;
+    //QString::number(players_[current_player_]->get_planets_()) + "/" + QString::number(total_planets_)
     win_str.append(QString::number(players_[current_player_]->get_planets_()) + "/" + QString::number(total_planets_)); //current players planet count / all planets in game
     ui->menuWin_0->setTitle(win_str);
 }
@@ -157,13 +166,7 @@ void MainWindow::PlanetClickedSlot(Planet * p)
 
         if(win){
             //delete planet from previous owner, decrement resources
-            /*
-             * for(Planet * x : player->get_planets()){
-             *  if(x->id == p->id){
-             *      player->get_planets().erase(x);
-             *  }
-             * }
-            */
+            players_[p->get_owner_id()]->remove_planet(p);
         }
 
     }

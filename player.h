@@ -16,6 +16,7 @@ public:
     int get_x() const { return x_; }  // inline member function
     int get_y() const { return y_; }  // inline member function
     int get_planets_() const { return planets_.size(); }
+    std::vector<Planet*> planets(){ return planets_; }
     double get_parts() const { return parts_; }
     double get_fuel() const { return fuel_; }
     double get_people() const { return people_; }
@@ -24,6 +25,7 @@ public:
 
     void call_turn();
     void add_planet(Planet *p);
+    void remove_planet(Planet *p);
 
     QRectF boundingRect() const override;
     QPainterPath shape() const override;

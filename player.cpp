@@ -72,3 +72,13 @@ void Player::call_turn()
 void Player::add_planet(Planet *p){
     planets_.push_back(p);
 }
+
+void Player::remove_planet(Planet *p){
+    int pos = 0;
+    for(Planet *x: planets_){
+        if(x->get_x() == p->get_x() && x->get_y() == p->get_y()){
+            planets_.erase(planets_.begin() + pos);
+        }
+        pos++;
+    }
+}
