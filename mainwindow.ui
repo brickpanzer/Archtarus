@@ -89,10 +89,16 @@
      <string>Win %: 0</string>
     </property>
    </widget>
+   <widget class="QMenu" name="menuCurrent_Player">
+    <property name="title">
+     <string>Current Player:</string>
+    </property>
+   </widget>
    <addaction name="menuOptions"/>
    <addaction name="menuStats"/>
    <addaction name="menuFuel_0"/>
    <addaction name="menuWin_0"/>
+   <addaction name="menuCurrent_Player"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">

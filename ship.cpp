@@ -15,16 +15,16 @@ Ship::Ship(const int x, const int y, const int player_id): x_(x), y_(y), player_
                 QGraphicsItem::ItemIgnoresTransformations );
     QColor color;
     switch(player_id_){
-        case 1: color.setRgb(27,24,219);
+        case 0: color.setRgb(27,24,219);
                 color_ = color;
                 break;
-        case 2: color.setRgb(37,219,24);
+        case 1: color.setRgb(37,219,24);
                 color_ = color;
                 break;
-        case 3: color.setRgb(219,24,203);
+        case 2: color.setRgb(219,24,203);
                 color_ = color;
                 break;
-        case 4: color.setRgb(24,209,219);
+        case 3: color.setRgb(24,209,219);
                 color_ = color;
                 break;
     }

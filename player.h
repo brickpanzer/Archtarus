@@ -27,6 +27,7 @@ public:
     void add_planet(Planet *p);
     void add_ship(Ship *s);
     void remove_planet(Planet *p);
+    bool level_fleet();
 
     QRectF boundingRect() const override;
     QPainterPath shape() const override;

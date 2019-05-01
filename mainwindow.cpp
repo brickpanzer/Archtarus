@@ -54,7 +54,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     //sets default player one to bottom left corner, as player number 1
     players_[0] = new Player(0,view->frameSize().height(),1);
-    Ship * starting_ship = new Ship(100,view->frameSize().height() - 100,1);
+    Ship * starting_ship = new Ship(100,view->frameSize().height() - 100,0);
     players_[0]->add_ship(starting_ship);
     scene->addItem(starting_ship);
     connect(starting_ship, &Ship::ShipClicked, this, &MainWindow::ShipClickedSlot);
@@ -94,18 +94,39 @@ void MainWindow::on_fleet_button_clicked()
     QPushButton * upgrade_fleet = test.addButton(tr("Upgrade?"), QMessageBox::ActionRole);
     QPushButton * fleet_cancel = test.addButton(QMessageBox::Abort);
     test.setDefaultButton(QMessageBox::Cancel);
-    test.setText("Fleet Status: ");
+    test.setText("Fleet Status: " + QString::number(players_[current_player_]->get_fleet_lvl()));
 
     test.exec();
 
     if(test.clickedButton() == upgrade_fleet) {
-        if(true/*check that player has enough resources*/){
-            //subtract resources
-
+        if(players_[current_player_]->level_fleet()){
             //add new ship
-            Ship * tmp = new Ship(players_[current_player_]->get_x(),players_[current_player_]->get_y(),current_player_);
+            int x_coord;
+            int y_coord;
+            switch(current_player_){
+                case 0 : x_coord = 100;
+                         y_coord = ui->graphicsView->frameSize().height() - 100;
+                         break;
+                case 1 : x_coord = ui->graphicsView->frameSize().width() - 100;
+                         y_coord = 100;
+                         break;
+                case 2 : x_coord = ui->graphicsView->frameSize().width() - 100;
+                         y_coord = ui->graphicsView->frameSize().height() - 100;
+                         break;
+                case 3 : x_coord = 100;
+                         y_coord = 100;
+                         break;
+                default : x_coord = 0;
+                          y_coord = 0;
+                          break;
+            }
+            Ship * tmp = new Ship(x_coord,y_coord,current_player_);
+            connect(tmp, &Ship::ShipClicked, this, &MainWindow::ShipClickedSlot);
             scene->addItem(tmp);
             players_[current_player_]->add_ship(tmp);
+        }
+        else{
+            //another modal?
         }
     }
     else if(test.clickedButton() == fleet_cancel) {
@@ -145,7 +166,7 @@ void MainWindow::on_take_turn_clicked()
     }
     //change player
     current_player_ = (current_player_ + 1) % total_players_;
-
+    ui->menuCurrent_Player->setTitle("Current player:" + QString::number(current_player_ + 1));
     //update stats
     players_[current_player_]->call_turn();
 
@@ -169,21 +190,21 @@ void MainWindow::on_actionAdd_Player_triggered()
     Ship * tmp4;
     switch(total_players_){
         case 1 : players_[1] = new Player(ui->graphicsView->frameSize().width(),0,2);
-                 tmp2 = new Ship(ui->graphicsView->frameSize().width() - 100,100,2);
+                 tmp2 = new Ship(ui->graphicsView->frameSize().width() - 100,100,1);
                  players_[1]->add_ship(tmp2);
                  scene->addItem(tmp2);
                  connect(tmp2, &Ship::ShipClicked, this, &MainWindow::ShipClickedSlot);
                  total_players_++;
                  break;
         case 2 : players_[2] = new Player(ui->graphicsView->frameSize().width(),ui->graphicsView->frameSize().height(),3);
-                 tmp3 = new Ship(ui->graphicsView->frameSize().width() - 100,ui->graphicsView->frameSize().height() - 100,3);
+                 tmp3 = new Ship(ui->graphicsView->frameSize().width() - 100,ui->graphicsView->frameSize().height() - 100,2);
                  players_[2]->add_ship(tmp3);
                  scene->addItem(tmp3);
                  connect(tmp3, &Ship::ShipClicked, this, &MainWindow::ShipClickedSlot);
                  total_players_++;
                  break;
         case 3 : players_[3] = new Player(0,0,4);
-                 tmp4 = new Ship(100,100,4);
+                 tmp4 = new Ship(100,100,3);
                  players_[3]->add_ship(tmp4);
                  scene->addItem(tmp4);
                  connect(tmp4, &Ship::ShipClicked, this, &MainWindow::ShipClickedSlot);
@@ -205,10 +226,10 @@ void MainWindow::PlanetClickedSlot(Planet * p)
     int dist;
     //if planet already owned
     if(p->get_owner_id() != -1){
-        bool win = true;
-        //fight for planet
 
-        if(win){
+        //fight for planet
+        //if attacker fleet level is greater than defenders, attackers win planet. otherwise tie or loss, defenders keep the planet
+        if(players_[current_player_]->get_fleet_lvl() > players_[p->get_owner_id()]->get_fleet_lvl()){
             //delete planet from previous owner
             players_[p->get_owner_id()]->remove_planet(p);
 

@@ -88,3 +88,19 @@ void Player::remove_planet(Planet *p){
         pos++;
     }
 }
+
+bool Player::level_fleet(){
+    if(fuel_ > 1000 * (fleet_lvl_ + 1) &&
+       parts_ > 300 * (fleet_lvl_ + 1) &&
+       people_ > 50 * (fleet_lvl_ + 1))
+    {
+        fuel_ -= (1000 * (fleet_lvl_ + 1));
+        parts_ -= (300 * (fleet_lvl_ + 1));
+        people_ -= (50 * (fleet_lvl_ + 1));
+        fleet_lvl_++;
+        return true;
+    }
+    else{
+        return false;
+    }
+}
