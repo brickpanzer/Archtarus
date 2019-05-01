@@ -10,6 +10,9 @@
 
 Ship::Ship(const int x, const int y, const int player_id): x_(x), y_(y), player_id_(player_id)
 {
+    setFlags( QGraphicsItem::ItemIsMovable |
+                QGraphicsItem::ItemIsSelectable |
+                QGraphicsItem::ItemIgnoresTransformations );
     QColor color;
     switch(player_id_){
         case 1: color.setRgb(27,24,219);
@@ -49,4 +52,17 @@ void Ship::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWid
 
     painter->drawRect(QRect(this->x_, this->y_, 20, 20));
     painter->setBrush(b);
+}
+
+void Ship::mousePressEvent(QGraphicsSceneMouseEvent *event) {
+
+    QGraphicsItem::mousePressEvent(event);
+    qDebug() << "Ship mouse press event triggered";
+    emit(ShipClicked(this));
+}
+
+void Ship::move(int x, int y){
+    x_ = x;
+    y_ = y;
+    update();
 }

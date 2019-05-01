@@ -57,6 +57,7 @@ MainWindow::MainWindow(QWidget *parent) :
     Ship * starting_ship = new Ship(100,view->frameSize().height() - 100,1);
     players_[0]->add_ship(starting_ship);
     scene->addItem(starting_ship);
+    connect(starting_ship, &Ship::ShipClicked, this, &MainWindow::ShipClickedSlot);
     current_player_ = 0;
     total_players_ = 1;
 }
@@ -122,7 +123,11 @@ void MainWindow::on_fleet_button_clicked()
 void MainWindow::on_take_turn_clicked()
 {
     //move previous players ships based on nav data
-
+    if(nav_ships_.size() > 0 && nav_planets_.size() > 0){
+        for(int i = 0; i < nav_ships_.size(); i++){
+           nav_ships_.at(i)->move(nav_planets_.at(i)->get_x(), nav_planets_.at(i)->get_y());
+        }
+    }
     //add planets + remove fuel
 
     //clear nav data
@@ -167,18 +172,21 @@ void MainWindow::on_actionAdd_Player_triggered()
                  tmp2 = new Ship(ui->graphicsView->frameSize().width() - 100,100,2);
                  players_[1]->add_ship(tmp2);
                  scene->addItem(tmp2);
+                 connect(tmp2, &Ship::ShipClicked, this, &MainWindow::ShipClickedSlot);
                  total_players_++;
                  break;
         case 2 : players_[2] = new Player(ui->graphicsView->frameSize().width(),ui->graphicsView->frameSize().height(),3);
                  tmp3 = new Ship(ui->graphicsView->frameSize().width() - 100,ui->graphicsView->frameSize().height() - 100,3);
                  players_[2]->add_ship(tmp3);
                  scene->addItem(tmp3);
+                 connect(tmp3, &Ship::ShipClicked, this, &MainWindow::ShipClickedSlot);
                  total_players_++;
                  break;
         case 3 : players_[3] = new Player(0,0,4);
                  tmp4 = new Ship(100,100,4);
                  players_[3]->add_ship(tmp4);
                  scene->addItem(tmp4);
+                 connect(tmp4, &Ship::ShipClicked, this, &MainWindow::ShipClickedSlot);
                  total_players_++;
                  break;
         default:
@@ -188,6 +196,13 @@ void MainWindow::on_actionAdd_Player_triggered()
 
 void MainWindow::PlanetClickedSlot(Planet * p)
 {
+    if(nav_ships_.size() == nav_planets_.size() && nav_ships_.size() > 0){
+        nav_planets_.back() = p;
+    }
+    else if(nav_ships_.size() != nav_planets_.size() && nav_ships_.size() > 0){
+        nav_planets_.push_back(p);
+    }
+    int dist;
     //if planet already owned
     if(p->get_owner_id() != -1){
         bool win = true;
@@ -210,5 +225,17 @@ void MainWindow::PlanetClickedSlot(Planet * p)
         players_[current_player_]->add_planet(p);
         p->ChangePlanetOwner(players_[current_player_]->get_player_color(), current_player_);
         qDebug() << "Empty planet taken";
+    }
+}
+
+void MainWindow::ShipClickedSlot(Ship * s){
+    if(nav_ships_.size() == 0){
+        nav_ships_.push_back(s);
+    }
+    else if(nav_ships_.size() > 0 && nav_ships_.size() == nav_planets_.size() + 1){
+        nav_ships_.back() = s;
+    }
+    else if(nav_ships_.size() > 0 && nav_ships_.size() == nav_planets_.size()){
+        nav_ships_.push_back(s);
     }
 }

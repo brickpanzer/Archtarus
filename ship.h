@@ -13,10 +13,16 @@ public:
     int get_x() const { return x_; }  // inline member function
     int get_y() const { return y_; }  // inline member function
 
+    void move(int x, int y);
+
     QRectF boundingRect() const override;
     QPainterPath shape() const override;
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *item, QWidget *widget) override;
+signals:
+    void ShipClicked(Ship * p);
+protected:
+    void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
 private:
     int x_;
     int y_;

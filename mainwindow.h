@@ -35,6 +35,8 @@ private slots:
 
     void PlanetClickedSlot(Planet * p);
 
+    void ShipClickedSlot(Ship * s);
+
 signals:
     void change_player_id(QColor color);
 private:
