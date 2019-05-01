@@ -11,7 +11,7 @@
 Player::Player(const int x, const int y, const int num): x_(x), y_(y), player_num_(num)
 {
     parts_ = 0.0;
-    fuel_ = 0.0;
+    fuel_ = 500;
     people_ = 0.0;
     fleet_lvl_ = 0;
     std::vector<Planet*> p_tmp;

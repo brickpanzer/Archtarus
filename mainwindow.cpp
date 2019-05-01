@@ -5,6 +5,7 @@
 #include <QTimer>
 #include <QRandomGenerator>
 #include <QMessageBox>
+#include <QtMath>
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -21,6 +22,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     view->setScene(scene);
     view->setSceneRect(0,0,view->frameSize().width(),view->frameSize().height());
+    view->setBackgroundBrush(Qt::black);
     total_planets_ = 0;
     for(int i = 0; i < 10; i++){
         for(int x = 0; x < 18; x++){
@@ -88,6 +90,45 @@ void MainWindow::on_actionPlayer_1_triggered()
     test.exec();
 }
 
+void MainWindow::on_actionPlayer_2_triggered()
+{
+    qDebug() << "clicked";
+    QMessageBox test;
+    test.setText("Stats for Player 2: \n"
+                 "Fuel: " + QString::number(players_[1]->get_fuel()) + "\n"
+                 "Parts: " + QString::number(players_[1]->get_parts()) + "\n"
+                 "Crew: " + QString::number(players_[1]->get_people()) + "\n"
+                 "Fleet Status: " + QString::number(players_[1]->get_fleet_lvl())
+                 );
+    test.exec();
+}
+
+void MainWindow::on_actionPlayer_3_triggered()
+{
+    qDebug() << "clicked";
+    QMessageBox test;
+    test.setText("Stats for Player 3: \n"
+                 "Fuel: " + QString::number(players_[2]->get_fuel()) + "\n"
+                 "Parts: " + QString::number(players_[2]->get_parts()) + "\n"
+                 "Crew: " + QString::number(players_[2]->get_people()) + "\n"
+                 "Fleet Status: " + QString::number(players_[2]->get_fleet_lvl())
+                 );
+    test.exec();
+}
+
+void MainWindow::on_actionPlayer_4_triggered()
+{
+    qDebug() << "clicked";
+    QMessageBox test;
+    test.setText("Stats for Player 3: \n"
+                 "Fuel: " + QString::number(players_[3]->get_fuel()) + "\n"
+                 "Parts: " + QString::number(players_[3]->get_parts()) + "\n"
+                 "Crew: " + QString::number(players_[3]->get_people()) + "\n"
+                 "Fleet Status: " + QString::number(players_[3]->get_fleet_lvl())
+                 );
+    test.exec();
+}
+
 void MainWindow::on_fleet_button_clicked()
 {
     QMessageBox test;
@@ -145,8 +186,31 @@ void MainWindow::on_take_turn_clicked()
 {
     //move previous players ships based on nav data
     if(nav_ships_.size() > 0 && nav_planets_.size() > 0){
-        for(int i = 0; i < nav_ships_.size(); i++){
+        for(uint i = 0; i < nav_ships_.size(); i++){
            nav_ships_.at(i)->move(nav_planets_.at(i)->get_x(), nav_planets_.at(i)->get_y());
+           //if planet already owned
+           if(nav_planets_.at(i)->get_owner_id() != -1){
+
+               //fight for planet
+               //if attacker fleet level is greater than defenders, attackers win planet. otherwise tie or loss, defenders keep the planet
+               if(players_[current_player_]->get_fleet_lvl() > players_[nav_planets_.at(i)->get_owner_id()]->get_fleet_lvl()){
+                   //delete planet from previous owner
+                   players_[nav_planets_.at(i)->get_owner_id()]->remove_planet(nav_planets_.at(i));
+
+                   players_[current_player_]->add_planet(nav_planets_.at(i));
+                   nav_planets_.at(i)->ChangePlanetOwner(players_[current_player_]->get_player_color(), current_player_);
+                   qDebug() << "Planet invaded";
+               }
+               else{
+                   qDebug() << "Planet invasion failed";
+               }
+
+           }
+           else{
+               players_[current_player_]->add_planet(nav_planets_.at(i));
+               nav_planets_.at(i)->ChangePlanetOwner(players_[current_player_]->get_player_color(), current_player_);
+               qDebug() << "Empty planet taken";
+           }
         }
     }
     //add planets + remove fuel
@@ -217,35 +281,20 @@ void MainWindow::on_actionAdd_Player_triggered()
 
 void MainWindow::PlanetClickedSlot(Planet * p)
 {
-    if(nav_ships_.size() == nav_planets_.size() && nav_ships_.size() > 0){
-        nav_planets_.back() = p;
-    }
-    else if(nav_ships_.size() != nav_planets_.size() && nav_ships_.size() > 0){
-        nav_planets_.push_back(p);
-    }
-    int dist;
-    //if planet already owned
-    if(p->get_owner_id() != -1){
-
-        //fight for planet
-        //if attacker fleet level is greater than defenders, attackers win planet. otherwise tie or loss, defenders keep the planet
-        if(players_[current_player_]->get_fleet_lvl() > players_[p->get_owner_id()]->get_fleet_lvl()){
-            //delete planet from previous owner
-            players_[p->get_owner_id()]->remove_planet(p);
-
-            players_[current_player_]->add_planet(p);
-            p->ChangePlanetOwner(players_[current_player_]->get_player_color(), current_player_);
-            qDebug() << "Planet invaded";
+    double x_diff = std::abs(p->get_x() - nav_ships_.back()->get_x());
+    double y_diff = std::abs(p->get_y() - nav_ships_.back()->get_y());
+    x_diff = qPow(x_diff,2);
+    y_diff = qPow(y_diff,2);
+    double dist = qPow((x_diff + y_diff),0.5);
+    if(dist < players_[current_player_]->get_fuel()){
+        //change planets - unpaint last (???) & paint new
+        if(nav_ships_.size() == nav_planets_.size() && nav_ships_.size() > 0){
+            nav_planets_.back() = p;
         }
-        else{
-            qDebug() << "Planet invasion failed";
+        //add planet - paint new
+        else if(nav_ships_.size() != nav_planets_.size() && nav_ships_.size() > 0){
+            nav_planets_.push_back(p);
         }
-
-    }
-    else{
-        players_[current_player_]->add_planet(p);
-        p->ChangePlanetOwner(players_[current_player_]->get_player_color(), current_player_);
-        qDebug() << "Empty planet taken";
     }
 }
 
@@ -259,4 +308,9 @@ void MainWindow::ShipClickedSlot(Ship * s){
     else if(nav_ships_.size() > 0 && nav_ships_.size() == nav_planets_.size()){
         nav_ships_.push_back(s);
     }
+}
+
+void MainWindow::on_AI_Turn_clicked()
+{
+
 }

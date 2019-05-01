@@ -37,6 +37,14 @@ private slots:
 
     void ShipClickedSlot(Ship * s);
 
+    void on_actionPlayer_2_triggered();
+
+    void on_actionPlayer_3_triggered();
+
+    void on_actionPlayer_4_triggered();
+
+    void on_AI_Turn_clicked();
+
 signals:
     void change_player_id(QColor color);
 private:
