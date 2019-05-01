@@ -25,6 +25,7 @@ public:
 
     void call_turn();
     void add_planet(Planet *p);
+    void add_ship(Ship *s);
     void remove_planet(Planet *p);
 
     QRectF boundingRect() const override;
@@ -41,6 +42,7 @@ private:
     double people_;
     int fleet_lvl_;
     std::vector<Planet*> planets_;
+    std::vector<Ship*> fleet_;
 };
 
 #endif // PLAYER_H

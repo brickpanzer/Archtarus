@@ -14,8 +14,10 @@ Player::Player(const int x, const int y, const int num): x_(x), y_(y), player_nu
     fuel_ = 0.0;
     people_ = 0.0;
     fleet_lvl_ = 0;
-    std::vector<Planet*> tmp;
-    planets_ = tmp;
+    std::vector<Planet*> p_tmp;
+    std::vector<Ship*> s_tmp;
+    fleet_ = s_tmp;
+    planets_ = p_tmp;
     QColor color;
     switch(player_num_){
         case 1: color.setRgb(27,24,219);
@@ -71,6 +73,10 @@ void Player::call_turn()
 
 void Player::add_planet(Planet *p){
     planets_.push_back(p);
+}
+
+void Player::add_ship(Ship *s){
+    fleet_.push_back(s);
 }
 
 void Player::remove_planet(Planet *p){

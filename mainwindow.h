@@ -46,6 +46,9 @@ private:
 
     Player * players_[4];
 
+    std::vector<Planet*> nav_planets_;
+    std::vector<Ship*> nav_ships_;
+
     int total_planets_;
     int total_players_;
     int current_player_;

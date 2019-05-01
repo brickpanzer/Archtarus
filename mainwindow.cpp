@@ -54,6 +54,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     //sets default player one to bottom left corner, as player number 1
     players_[0] = new Player(0,view->frameSize().height(),1);
+    Ship * starting_ship = new Ship(100,view->frameSize().height() - 100,1);
+    players_[0]->add_ship(starting_ship);
+    scene->addItem(starting_ship);
     current_player_ = 0;
     total_players_ = 1;
 }
@@ -95,8 +98,14 @@ void MainWindow::on_fleet_button_clicked()
     test.exec();
 
     if(test.clickedButton() == upgrade_fleet) {
-        qDebug() << "Upgraded!";
-        //upgrade
+        if(true/*check that player has enough resources*/){
+            //subtract resources
+
+            //add new ship
+            Ship * tmp = new Ship(players_[current_player_]->get_x(),players_[current_player_]->get_y(),current_player_);
+            scene->addItem(tmp);
+            players_[current_player_]->add_ship(tmp);
+        }
     }
     else if(test.clickedButton() == fleet_cancel) {
         qDebug() << "Exited window";
@@ -112,6 +121,15 @@ void MainWindow::on_fleet_button_clicked()
 */
 void MainWindow::on_take_turn_clicked()
 {
+    //move previous players ships based on nav data
+
+    //add planets + remove fuel
+
+    //clear nav data
+    nav_ships_.clear();
+    nav_planets_.clear();
+
+    //check win condition
     qDebug() << "My Planets: " << players_[current_player_]->get_planets_();
     qDebug() << "Needed Planets: " << total_planets_;
     if(players_[current_player_]->get_planets_() == total_planets_){
@@ -124,7 +142,6 @@ void MainWindow::on_take_turn_clicked()
     current_player_ = (current_player_ + 1) % total_players_;
 
     //update stats
-
     players_[current_player_]->call_turn();
 
     //set fuel guage
@@ -142,14 +159,26 @@ void MainWindow::on_take_turn_clicked()
 
 void MainWindow::on_actionAdd_Player_triggered()
 {
+    Ship * tmp2;
+    Ship * tmp3;
+    Ship * tmp4;
     switch(total_players_){
         case 1 : players_[1] = new Player(ui->graphicsView->frameSize().width(),0,2);
+                 tmp2 = new Ship(ui->graphicsView->frameSize().width() - 100,100,2);
+                 players_[1]->add_ship(tmp2);
+                 scene->addItem(tmp2);
                  total_players_++;
                  break;
         case 2 : players_[2] = new Player(ui->graphicsView->frameSize().width(),ui->graphicsView->frameSize().height(),3);
+                 tmp3 = new Ship(ui->graphicsView->frameSize().width() - 100,ui->graphicsView->frameSize().height() - 100,3);
+                 players_[2]->add_ship(tmp3);
+                 scene->addItem(tmp3);
                  total_players_++;
                  break;
         case 3 : players_[3] = new Player(0,0,4);
+                 tmp4 = new Ship(100,100,4);
+                 players_[3]->add_ship(tmp4);
+                 scene->addItem(tmp4);
                  total_players_++;
                  break;
         default:
@@ -165,12 +194,21 @@ void MainWindow::PlanetClickedSlot(Planet * p)
         //fight for planet
 
         if(win){
-            //delete planet from previous owner, decrement resources
+            //delete planet from previous owner
             players_[p->get_owner_id()]->remove_planet(p);
+
+            players_[current_player_]->add_planet(p);
+            p->ChangePlanetOwner(players_[current_player_]->get_player_color(), current_player_);
+            qDebug() << "Planet invaded";
+        }
+        else{
+            qDebug() << "Planet invasion failed";
         }
 
     }
-    players_[current_player_]->add_planet(p);
-    p->ChangePlanetOwner(players_[current_player_]->get_player_color(), current_player_);
-    qDebug() << "Planet clicked slot triggered";
+    else{
+        players_[current_player_]->add_planet(p);
+        p->ChangePlanetOwner(players_[current_player_]->get_player_color(), current_player_);
+        qDebug() << "Empty planet taken";
+    }
 }
