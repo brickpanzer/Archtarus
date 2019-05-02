@@ -22,8 +22,14 @@ MainWindow::MainWindow(QWidget *parent) :
 
     view->setScene(scene);
     view->setSceneRect(0,0,view->frameSize().width(),view->frameSize().height());
+    //QPixmap pim("./galaxy-wallpaper-11.jpg");
+    //view->setBackgroundBrush(pim.scaled(view->frameSize().width(),view->frameSize().height(),Qt::IgnoreAspectRatio,Qt::SmoothTransformation));
     view->setBackgroundBrush(Qt::black);
     total_planets_ = 0;
+
+    Planet * empty_space = new Planet(0,0,0,0,0);
+    Planet & empty_ref = *empty_space;
+
     for(int i = 0; i < 10; i++){
         for(int x = 0; x < 18; x++){
             const int x_coord = (x * 100);
@@ -34,23 +40,30 @@ MainWindow::MainWindow(QWidget *parent) :
             int size;
             if(rand < 10){
                 size = 0;
+                starmap_[i][x] = &empty_ref;
             }
             else if(rand == 10 || rand == 11 || rand == 12){
-                size = 1;
+                Planet * temp = new Planet(x_coord,y_coord,x_off,y_off,1);
+                starmap_[i][x] = temp;
+                scene->addItem(temp);
+                connect(temp, &Planet::PlanetClicked, this, &MainWindow::PlanetClickedSlot);
                 total_planets_++;
             }
             else if(rand == 13 || rand == 14){
-                size = 2;
+                Planet * temp = new Planet(x_coord,y_coord,x_off,y_off,2);
+                starmap_[i][x] = temp;
+                scene->addItem(temp);
+                connect(temp, &Planet::PlanetClicked, this, &MainWindow::PlanetClickedSlot);
                 total_planets_++;
             }
             else{
-                size = 3;
+                Planet * temp = new Planet(x_coord,y_coord,x_off,y_off,3);
+                starmap_[i][x] = temp;
+                scene->addItem(temp);
+                connect(temp, &Planet::PlanetClicked, this, &MainWindow::PlanetClickedSlot);
                 total_planets_++;
             }
-            Planet * temp = new Planet(x_coord,y_coord,x_off,y_off,size);
-            starmap_[i][x] = temp;
-            scene->addItem(temp);
-            connect(temp, &Planet::PlanetClicked, this, &MainWindow::PlanetClickedSlot);
+
         }
     }
 
@@ -62,6 +75,11 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(starting_ship, &Ship::ShipClicked, this, &MainWindow::ShipClickedSlot);
     current_player_ = 0;
     total_players_ = 1;
+
+    p1_wins = 0;
+    p2_wins = 0;
+    p3_wins = 0;
+    p4_wins = 0;
 }
 
 MainWindow::~MainWindow()
@@ -225,8 +243,26 @@ void MainWindow::on_take_turn_clicked()
     if(players_[current_player_]->get_planets_() == total_planets_){
         qDebug() << "Win Condition!";
         QMessageBox you_win;
+        switch(current_player_){
+        case 0 : p1_wins++;
+            break;
+        case 1 :p2_wins++;
+            break;
+        case 2 : p3_wins++;
+            break;
+        case 3 : p4_wins++;
+            break;
+        default:
+            break;
+        }
         you_win.setText("Player: " + QString::number(current_player_ + 1) + " wins!");
+        you_win.setInformativeText("Total Wins: \n"
+                                   "Player 1: " + QString::number(p1_wins) + "\n" +
+                                   "Player 2: " + QString::number(p2_wins) + "\n" +
+                                   "Player 3: " + QString::number(p3_wins) + "\n" +
+                                   "Player 3: " + QString::number(p3_wins));
         you_win.exec();
+        on_actionNew_Game_2_triggered();
     }
     //change player
     current_player_ = (current_player_ + 1) % total_players_;
@@ -245,6 +281,8 @@ void MainWindow::on_take_turn_clicked()
     //QString::number(players_[current_player_]->get_planets_()) + "/" + QString::number(total_planets_)
     win_str.append(QString::number(players_[current_player_]->get_planets_()) + "/" + QString::number(total_planets_)); //current players planet count / all planets in game
     ui->menuWin_0->setTitle(win_str);
+
+    scene->update();
 }
 
 void MainWindow::on_actionAdd_Player_triggered()
@@ -310,7 +348,126 @@ void MainWindow::ShipClickedSlot(Ship * s){
     }
 }
 
-void MainWindow::on_AI_Turn_clicked()
+void MainWindow::on_AI_Turn_clicked()//AI simply looks for the nearest planet to each ship, reguardless of fuel/enemies/current occupancy
 {
+    Planet * nearest = nullptr;
+    double dist = 5000;
+    double temp_dist = 0;
+    for(Ship * x: players_[current_player_]->fleet()){
+        nav_ships_.push_back(x);
+        for(int i = 0; i < 10; i++){
+            for(int j = 0; j < 18; j++){
+                temp_dist = qPow((qPow(std::abs(x->get_x() - starmap_[i][j]->get_x()),2)// | ship x - planet x | ^ 2
+                                  + qPow(std::abs(x->get_y() - starmap_[i][j]->get_y()),2))// | ship y - planet y | ^ 2
+                                 ,0.5);// root the sum of above to get distance
 
+                if(temp_dist < dist && //if this planet is closer than our last
+                   starmap_[i][j]->get_owner_id() != current_player_ && //AND its not the current planet (LOL)
+                   starmap_[i][j]->get_fuel() !=  0.0) // AND its a real planet (L O L)
+                {
+                    nearest = starmap_[i][j];
+                    dist = temp_dist;//reset our smallest distance
+                }
+            }
+        }
+        if(nearest){//if we find a nearby planet (should always occur) set its coordinates
+            nav_planets_.push_back(nearest);
+            if(nearest->get_owner_id() != -1 && nearest->get_owner_id() != current_player_){//if current planet is occupied, try to upgrade fleet
+                if(players_[current_player_]->level_fleet()){
+                    //add new ship
+                    int x_coord;
+                    int y_coord;
+                    switch(current_player_){
+                        case 0 : x_coord = 100;
+                                 y_coord = ui->graphicsView->frameSize().height() - 100;
+                                 break;
+                        case 1 : x_coord = ui->graphicsView->frameSize().width() - 100;
+                                 y_coord = 100;
+                                 break;
+                        case 2 : x_coord = ui->graphicsView->frameSize().width() - 100;
+                                 y_coord = ui->graphicsView->frameSize().height() - 100;
+                                 break;
+                        case 3 : x_coord = 100;
+                                 y_coord = 100;
+                                 break;
+                        default : x_coord = 0;
+                                  y_coord = 0;
+                                  break;
+                    }
+                    Ship * tmp = new Ship(x_coord,y_coord,current_player_);
+                    connect(tmp, &Ship::ShipClicked, this, &MainWindow::ShipClickedSlot);
+                    scene->addItem(tmp);
+                    players_[current_player_]->add_ship(tmp);
+                }
+            }
+        }
+    }
+    on_take_turn_clicked();
+}
+
+void MainWindow::on_actionNew_Game_2_triggered()
+{
+    for(int i = 0; i < 4; i++){
+        if(players_[i]){
+            for(Ship * x : players_[i]->fleet()){
+                scene->removeItem(x);
+            }
+        }
+    }
+    scene->removeItem(players_[0]);
+    scene->removeItem(players_[1]);
+    scene->removeItem(players_[2]);
+    scene->removeItem(players_[3]);
+
+    total_planets_ = 0;
+
+    Planet * empty_space = new Planet(0,0,0,0,0);
+    Planet & empty_ref = *empty_space;
+
+    for(int i = 0; i < 10; i++){
+        for(int x = 0; x < 18; x++){
+            scene->removeItem(starmap_[i][x]);
+            const int x_coord = (x * 100);
+            const int y_coord = (i * 100);
+            const int x_off = QRandomGenerator::global()->bounded(0,50);
+            const int y_off = QRandomGenerator::global()->bounded(0,50);
+            int rand = QRandomGenerator::global()->bounded(0,16);
+            int size;
+            if(rand < 10){
+                size = 0;
+                starmap_[i][x] = &empty_ref;
+            }
+            else if(rand == 10 || rand == 11 || rand == 12){
+                Planet * temp = new Planet(x_coord,y_coord,x_off,y_off,1);
+                starmap_[i][x] = temp;
+                scene->addItem(temp);
+                connect(temp, &Planet::PlanetClicked, this, &MainWindow::PlanetClickedSlot);
+                total_planets_++;
+            }
+            else if(rand == 13 || rand == 14){
+                Planet * temp = new Planet(x_coord,y_coord,x_off,y_off,2);
+                starmap_[i][x] = temp;
+                scene->addItem(temp);
+                connect(temp, &Planet::PlanetClicked, this, &MainWindow::PlanetClickedSlot);
+                total_planets_++;
+            }
+            else{
+                Planet * temp = new Planet(x_coord,y_coord,x_off,y_off,3);
+                starmap_[i][x] = temp;
+                scene->addItem(temp);
+                connect(temp, &Planet::PlanetClicked, this, &MainWindow::PlanetClickedSlot);
+                total_planets_++;
+            }
+            scene->update();
+        }
+    }
+
+    //sets default player one to bottom left corner, as player number 1
+    players_[0] = new Player(0,ui->graphicsView->frameSize().height(),1);
+    Ship * starting_ship = new Ship(100,ui->graphicsView->frameSize().height() - 100,0);
+    players_[0]->add_ship(starting_ship);
+    scene->addItem(starting_ship);
+    connect(starting_ship, &Ship::ShipClicked, this, &MainWindow::ShipClickedSlot);
+    current_player_ = 0;
+    total_players_ = 1;
 }

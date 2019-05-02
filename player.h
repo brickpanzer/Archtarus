@@ -12,7 +12,6 @@ class Player : public QObject , public QGraphicsItem
     Q_OBJECT
 public:
     Player(const int x, const int y, const int player_num_);
-
     int get_x() const { return x_; }  // inline member function
     int get_y() const { return y_; }  // inline member function
     int get_planets_() const { return planets_.size(); }
@@ -22,6 +21,7 @@ public:
     double get_people() const { return people_; }
     int get_fleet_lvl() const { return fleet_lvl_; }
     QColor get_player_color() const { return player_color_; }
+    std::vector<Ship*> fleet() { return fleet_; }
 
     void call_turn();
     void add_planet(Planet *p);

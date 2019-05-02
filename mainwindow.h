@@ -45,6 +45,8 @@ private slots:
 
     void on_AI_Turn_clicked();
 
+    void on_actionNew_Game_2_triggered();
+
 signals:
     void change_player_id(QColor color);
 private:
@@ -62,6 +64,11 @@ private:
     int total_planets_;
     int total_players_;
     int current_player_;
+
+    int p1_wins;
+    int p2_wins;
+    int p3_wins;
+    int p4_wins;
 };
 
 #endif // MAINWINDOW_H
